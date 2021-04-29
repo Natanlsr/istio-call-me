@@ -1,0 +1,101 @@
+##################################################################################################
+# Call application
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: call-me-application
+  labels:
+    app: call-me-application
+    service: call-me-application
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: call-me-application
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: call
+  labels:
+    account: call-me-application
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: call-me-application
+  labels:
+    app: call-me-application
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: call-me-application
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: call-me-application
+        version: v1
+    spec:
+      serviceAccountName: call
+      containers:
+        - name: call-me-application
+          image:  call-me-application:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+##################################################################################################
+# Auth application
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-application
+  labels:
+    app: auth-application
+    service: auth-application
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: auth-application
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: auth
+  labels:
+    account: auth-application
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-application
+  labels:
+    app: auth-application
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-application
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: auth-application
+        version: v1
+    spec:
+      serviceAccountName: auth
+      containers:
+        - name: auth-application
+          image:  call-me-application:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
